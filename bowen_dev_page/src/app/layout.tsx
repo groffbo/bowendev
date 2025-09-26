@@ -1,8 +1,8 @@
 import "./globals.css";
 
 export const metadata = {
-  title: "My App",
-  description: "SPA-style app with Tailwind CSS",
+  title: "Bowen Groff Dev Portfolio",
+  description: "A showcase of my internship experience, tech stack, and club involvement",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

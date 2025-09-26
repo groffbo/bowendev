@@ -9,18 +9,26 @@ export default function HomeSection() {
       transition={{ duration: 0.8 }}
       className="flex flex-col items-center space-y-4 p-6"
     >
-
       <p className="text-xl text-gray-300 text-center">Hello World, I’m</p>
 
-      <h1 className="text-4xl font-bold text-center text-gradient">Bowen Groff</h1>
-
-      <p className="text-gray-400 font-medium text-center">Computer Engineering Student</p>
+      <h1 className="text-4xl md:text-6xl font-bold text-center text-gradient">
+        Bowen Groff
+      </h1>
 
       <img
         src="/profile.jpg"
         alt="Profile"
-        className="w-32 h-32 rounded-full object-cover mt-4"
+        className="w-40 md:w-64 h-40 md:h-64 rounded-full object-cover mt-4"
       />
+
+      <p className="text-gray-400 font-medium text-center mt-2">
+        Computer Engineering Student
+      </p>
+
+      <p className="text-gray-400 font-medium text-center">
+        University of Central Florida
+      </p>
     </motion.div>
   );
 }
+
