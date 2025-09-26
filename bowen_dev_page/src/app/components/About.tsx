@@ -67,7 +67,7 @@ export default function About() {
       </div>
 
       <div className="bg-gray-800 rounded-xl shadow-lg p-6 max-w-lg w-full flex flex-col items-center">
-        <h2 className="text-3xl font-bold text-white mb-4 text-center">Tech Stack</h2>
+        <h2 className="text-3xl font-bold text-white mb-4 text-center text-gradient">Tech Stack</h2>
         <div className="flex flex-col gap-6 w-full">
           {Object.entries(techStack).map(([section, items]) => (
             <div key={section} className="flex flex-col items-center w-full">
