@@ -58,7 +58,7 @@ export default function About() {
 
       <div className="bg-gray-800 rounded-xl shadow-lg p-6 max-w-lg w-full flex flex-col items-center">
         <p className="text-gray-300 text-center mb-4">
-          Hi, I'm Bowen! :-) I am drawn to code for one main reason: the only limitation as to what can be done with technology is our own imagination.
+          Hi, my name is Bowen! :-D I am drawn to code for one main reason: the only limitation as to what can be done with technology is our own imagination.
         </p>
 
         <p className="text-gray-400 text-center">
