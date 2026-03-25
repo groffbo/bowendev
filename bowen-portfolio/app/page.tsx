@@ -154,7 +154,7 @@ function Page() {
             onClick={() => addWindow("timeline")}
           >
             <Image src={skills} alt="Skills icon"></Image>
-            Skills
+            Experience
           </button>
         </div>
 
