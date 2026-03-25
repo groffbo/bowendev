@@ -71,7 +71,6 @@ export default function Window({
     height: height ? `${height}px` : "400px",
     maxWidth: "95vw",
     maxHeight: "90vh",
-    overflow: "auto",
     display: "flex",
     flexDirection: "column",
   };
@@ -97,7 +96,7 @@ export default function Window({
         </button>
         <span>{title}</span>
       </div>
-      <div>{children}</div>
+      <div style={{ height: 'calc(100% - 25px)', overflowY: 'auto', position: 'relative', zIndex: 0 }}>{children}</div>
     </div>
   );
 }

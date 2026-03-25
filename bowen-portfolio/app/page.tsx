@@ -12,6 +12,7 @@ import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 
 import Window from "./_components/window";
+import TimelineWindow from "./_components/TimelineWindow";
 
 import "./globals.css";
 
@@ -86,6 +87,28 @@ function Page() {
     return () => window.removeEventListener("resize", checkMobile);
   }, []);
 
+  const addWindow = (id: string) => {
+    const existingWindow = windows.find((w) => w.id === id);
+    if (existingWindow) {
+      if (!existingWindow.isOpen) {
+        toggleWindow(id);
+      }
+      return;
+    }
+
+    const isMobile = window.innerWidth < 768;
+    const newWindow: AppWindow = {
+      id,
+      title: "Experience",
+      isOpen: true,
+      ...(isMobile
+        ? { width: 350, height: 500, center: true }
+        : { startX: 400, startY: 200, width: 800, height: 600 }),
+    };
+
+    setWindows((prev) => [...prev, newWindow]);
+  };
+
   // Open or close a window
   const toggleWindow = (id: string) => {
     setWindows((prev) =>
@@ -126,11 +149,13 @@ function Page() {
             Linkedin
           </button>
 
-          {/* <button
+          <button
             className="icon"
-            onClick={()}>
-            <Image src={skills}></Image>
-          </button> */}
+            onClick={() => addWindow("timeline")}
+          >
+            <Image src={skills} alt="Skills icon"></Image>
+            Skills
+          </button>
         </div>
 
         <div className="convex taskbar">
@@ -208,6 +233,8 @@ function Page() {
                 <button className="convex" onClick={() => toggleWindow("welcome-mobile")} style={{width: "50px", padding: "5px"}}>Ok</button>
               </div>
             
+            ) : w.id === "timeline" ? (
+              <TimelineWindow />
             ) : (
               <p></p>
             )}
