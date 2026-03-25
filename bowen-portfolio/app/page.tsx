@@ -75,7 +75,7 @@ function Page() {
       setWindows(
         [
           mobile ?
-          { id: "welcome-mobile", title: "Hello World", isOpen: true, width:200, height:120, center: true } : 
+          { id: "welcome-mobile", title: "Hello World, I'm Bowen!", isOpen: true, width:200, height:120, center: true } : 
           { id: "welcome", title: "Hello World", isOpen: true, startX: 350, startY: 150, width: 600, height: 250}
         ]
       )
