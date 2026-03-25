@@ -13,7 +13,10 @@ interface WindowProps {
   children: React.ReactNode;
   startX?: number;
   startY?: number;
+  width?: number | string;
+  height?: number | string;
   onClose?: () => void;
+  center?: boolean;
 }
 
 export default function Window({
@@ -21,14 +24,18 @@ export default function Window({
   children,
   startX = 100,
   startY = 100,
+  width,
+  height,
+  onClose,
+  center,
 }: WindowProps) {
   const windowRef = useRef<HTMLDivElement>(null);
   const [pos, setPos] = useState({ x: startX, y: startY });
   const [dragging, setDrag] = useState(false);
   const [offset, setOffset] = useState({ x: 0, y: 0 });
-  const [show, setShow] = useState(true);
 
   const startDrag = (e: React.MouseEvent) => {
+    if (center) return;
     setDrag(true);
     setOffset({
       x: e.clientX - pos.x,
@@ -38,7 +45,7 @@ export default function Window({
 
   useEffect(() => {
     const duringDrag = (e: MouseEvent) => {
-      if (!dragging) return;
+      if (!dragging || center) return;
       setPos({
         x: e.clientX - offset.x,
         y: e.clientY - offset.y,
@@ -56,18 +63,33 @@ export default function Window({
       document.removeEventListener("mousemove", duringDrag);
       document.removeEventListener("mouseup", stopDrag);
     };
-  }, [dragging, offset]);
+  }, [dragging, offset, center]);
 
-  const onClose = () => setShow(false);
-  {
-    if (!show) return null;
+  const style: React.CSSProperties = {
+    position: "absolute",
+    width: width ? `${width}px` : "600px",
+    height: height ? `${height}px` : "400px",
+    maxWidth: "95vw",
+    maxHeight: "90vh",
+    overflow: "auto",
+    display: "flex",
+    flexDirection: "column",
+  };
+
+  if (center) {
+    style.left = "50%";
+    style.top = "50%";
+    style.transform = "translate(-50%, -50%)";
+  } else {
+    style.left = pos.x;
+    style.top = pos.y;
   }
 
   return (
     <div
       ref={windowRef}
       className="convex window"
-      style={{ left: pos.x, top: pos.y, position: "absolute" }}
+      style={style}
     >
       <div className="window-header" onMouseDown={startDrag}>
         <button onClick={onClose} className="convex window-header-button">
