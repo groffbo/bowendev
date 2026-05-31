@@ -12,7 +12,8 @@ import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 
 import Window from "./_components/window";
-import TimelineWindow from "./_components/TimelineWindow";
+import TimelineWindow, { positions } from "./_components/TimelineWindow";
+import Position from "./_components/Position";
 
 import "./globals.css";
 
@@ -87,7 +88,7 @@ function Page() {
     return () => window.removeEventListener("resize", checkMobile);
   }, []);
 
-  const addWindow = (id: string) => {
+  const addWindow = (id: string, customTitle?: string) => {
     const existingWindow = windows.find((w) => w.id === id);
     if (existingWindow) {
       if (!existingWindow.isOpen) {
@@ -99,7 +100,7 @@ function Page() {
     const isMobile = window.innerWidth < 768;
     const newWindow: AppWindow = {
       id,
-      title: "Experience",
+      title: customTitle || "Experience",
       isOpen: true,
       ...(isMobile
         ? { width: 350, height: 500, center: true }

@@ -67,8 +67,8 @@ export default function Window({
 
   const style: React.CSSProperties = {
     position: "absolute",
-    width: width ? `${width}px` : "600px",
-    height: height ? `${height}px` : "400px",
+    width: width ? `${width}px` : "800px",
+    height: height ? `${height}px` : "600px",
     maxWidth: "95vw",
     maxHeight: "90vh",
     display: "flex",
