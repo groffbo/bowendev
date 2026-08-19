@@ -253,12 +253,13 @@ button {
 
   /* Make windows fit smaller screens */
   .window {
-    width: 90vw;
-    height: 80vh;
-    max-width: 400px;
-    max-height: 600px;
-    left: 5%;
-    top: 5%;
+    width: 92vw !important;
+    height: 80vh !important;
+    max-width: 500px !important;
+    max-height: 82vh !important;
+    left: 50% !important;
+    top: 48% !important;
+    transform: translate(-50%, -50%) !important;
   }
 
   .window-body {

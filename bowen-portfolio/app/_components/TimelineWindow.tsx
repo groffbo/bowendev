@@ -133,12 +133,42 @@ const timelineGroups = [
   }
 ];
 
-const getLogoContent = (company: string) => {
-  if (company.includes('AMD')) return <img src="https://cdn.simpleicons.org/amd/000000" alt="AMD" style={{ width: '32px', height: '32px' }} />;
-  if (company.includes('IEEE')) return <img src="https://cdn.simpleicons.org/ieee/000000" alt="IEEE" style={{ width: '32px', height: '32px' }} />;
-  if (company.includes('Knight Hacks')) return <span style={{ fontSize: '1.2rem', fontWeight: 'bold' }}>KH</span>;
-  if (company.includes('L3Harris')) return <span style={{ fontSize: '1.2rem', fontWeight: 'bold' }}>L3H</span>;
-  return <span style={{ fontSize: '1.2rem', fontWeight: 'bold' }}>{company.substring(0, 3).toUpperCase()}</span>;
+// Most recent experiences first (2026 -> 2023) for vertical scrolling on mobile
+const mobileTimelineGroups = [
+  {
+    label: "2026 (Present)",
+    items: [
+      { pos: positions[1], index: 1 }, // Feb 2026 - Knight Hacks Design Director
+      { pos: positions[0], index: 0 }  // Jan 2026 - AMD GPU Intern
+    ]
+  },
+  {
+    label: "2025",
+    items: [
+      { pos: positions[2], index: 2 }, // Oct 2025 - IEEE UCF Project Lead
+      { pos: positions[3], index: 3 }  // Sep 2025 - Knight Hacks Dev Team
+    ]
+  },
+  {
+    label: "2024",
+    items: [
+      { pos: positions[4], index: 4 } // May 2024 - L3Harris Intern
+    ]
+  },
+  {
+    label: "2023",
+    items: [
+      { pos: positions[5], index: 5 } // Summer 2023 - L3Harris Intern
+    ]
+  }
+];
+
+const getLogoContent = (company: string, size = 32) => {
+  if (company.includes('AMD')) return <img src="https://cdn.simpleicons.org/amd/000000" alt="AMD" style={{ width: `${size}px`, height: `${size}px` }} />;
+  if (company.includes('IEEE')) return <img src="https://cdn.simpleicons.org/ieee/000000" alt="IEEE" style={{ width: `${size}px`, height: `${size}px` }} />;
+  if (company.includes('Knight Hacks')) return <span style={{ fontSize: `${size * 0.45}px`, fontWeight: 'bold' }}>KH</span>;
+  if (company.includes('L3Harris')) return <span style={{ fontSize: `${size * 0.45}px`, fontWeight: 'bold' }}>L3H</span>;
+  return <span style={{ fontSize: `${size * 0.45}px`, fontWeight: 'bold' }}>{company.substring(0, 3).toUpperCase()}</span>;
 };
 
 const TimelineNode = ({ item, onClick }: { item: { pos: any, index: number }, onClick: () => void }) => {
@@ -176,7 +206,7 @@ const TimelineNode = ({ item, onClick }: { item: { pos: any, index: number }, on
           boxShadow: 'inset 2px 2px 4px rgba(255,255,255,0.8)'
         }}
       >
-        {getLogoContent(item.pos.company)}
+        {getLogoContent(item.pos.company, 32)}
       </button>
       
       {hovered && (
@@ -241,8 +271,24 @@ const TimelineWindow = () => {
             50% { transform: translateY(-8px); }
             100% { transform: translateY(0px); }
           }
+          .win95-tabs-container {
+            display: flex;
+            gap: 2px;
+            padding-left: 4px;
+            overflow-x: auto;
+            overflow-y: hidden;
+            white-space: nowrap;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: thin;
+          }
+          .win95-tabs-container::-webkit-scrollbar {
+            height: 4px;
+          }
+          .win95-tabs-container::-webkit-scrollbar-thumb {
+            background: #808080;
+          }
           .win95-tab {
-            padding: 4px 12px;
+            padding: 4px 10px;
             background-color: #c0c0c0;
             border-top-left-radius: 3px;
             border-top-right-radius: 3px;
@@ -254,8 +300,10 @@ const TimelineWindow = () => {
             position: relative;
             display: flex;
             align-items: center;
-            gap: 8px;
-            font-size: 0.9rem;
+            gap: 6px;
+            font-size: 0.85rem;
+            flex-shrink: 0;
+            user-select: none;
           }
           .win95-tab.active {
             border-bottom: 2px solid #c0c0c0;
@@ -269,11 +317,41 @@ const TimelineWindow = () => {
             z-index: 1;
             margin-top: 2px;
           }
+          .timeline-desktop-layout {
+            display: flex;
+            align-items: center;
+            flex: 1;
+            overflow-x: auto;
+            overflow-y: auto;
+          }
+          .timeline-mobile-layout {
+            display: none;
+          }
+          .timeline-mobile-card:active {
+            border-top: 2px solid gray !important;
+            border-left: 2px solid gray !important;
+            border-right: 2px solid #fff !important;
+            border-bottom: 2px solid #fff !important;
+            background-color: #b0b0b0 !important;
+          }
+          @media (max-width: 768px) {
+            .timeline-desktop-layout {
+              display: none !important;
+            }
+            .timeline-mobile-layout {
+              display: flex !important;
+              flex-direction: column;
+              flex: 1;
+              overflow-y: auto;
+              overflow-x: hidden;
+              padding: 1rem 0.5rem 1.5rem 0.5rem;
+            }
+          }
         `}
       </style>
 
       {/* Tabs Header */}
-      <div style={{ display: 'flex', gap: '2px', paddingLeft: '4px' }}>
+      <div className="win95-tabs-container">
         {tabs.map(tab => (
           <div 
             key={tab.id}
@@ -311,75 +389,212 @@ const TimelineWindow = () => {
         backgroundColor: '#c0c0c0',
         overflow: 'hidden',
         display: 'flex',
-        flexDirection: 'column'
+        flexDirection: 'column',
+        minHeight: 0
       }}>
         {activeTab === 'overview' ? (
           <div className="concave" style={{
             flex: 1,
             margin: '4px',
-            overflowX: 'auto',
-            overflowY: 'auto',
+            overflow: 'hidden',
             backgroundImage: "url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMyIgaGVpZ2h0PSIzIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxyZWN0IHdpZHRoPSIzIiBoZWlnaHQ9IjMiIGZpbGw9IiNGQkZBRjAiIC8+PHJlY3Qgd2lkdGg9IjEiIGhlaWdodD0iMSIgZmlsbD0iI0FDQTg5OSIgLz48L3N2Zz4=')",
             backgroundRepeat: 'repeat',
             display: 'flex',
-            alignItems: 'center'
+            flexDirection: 'column'
           }}>
-            <div style={{ display: 'flex', alignItems: 'flex-start', minWidth: 'max-content', padding: '4rem 2rem 2rem 2rem', gap: '8rem', position: 'relative' }}>
-              
-              {/* Background horizontal connection line */}
-              <div style={{
-                position: 'absolute',
-                left: '2rem',
-                right: '2rem',
-                top: 'calc(4rem + 30px)', // Centers exactly on the first row of 60px nodes
-                height: '4px',
-                backgroundColor: '#808080',
-                borderTop: '2px solid #dfdfdf',
-                borderBottom: '2px solid #dfdfdf',
-                zIndex: 0
-              }} />
+            {/* Desktop Horizontal View */}
+            <div className="timeline-desktop-layout">
+              <div style={{ display: 'flex', alignItems: 'flex-start', minWidth: 'max-content', padding: '4rem 2rem 2rem 2rem', gap: '8rem', position: 'relative' }}>
+                
+                {/* Background horizontal connection line */}
+                <div style={{
+                  position: 'absolute',
+                  left: '2rem',
+                  right: '2rem',
+                  top: 'calc(4rem + 30px)',
+                  height: '4px',
+                  backgroundColor: '#808080',
+                  borderTop: '2px solid #dfdfdf',
+                  borderBottom: '2px solid #dfdfdf',
+                  zIndex: 0
+                }} />
 
-              {timelineGroups.map((group, groupIndex) => (
-                <div key={groupIndex} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', position: 'relative', zIndex: 1 }}>
-                  
-                  {/* Year Label */}
-                  <div style={{ position: 'absolute', top: '-3rem', fontWeight: 'bold', fontSize: '1.2rem', color: '#000', whiteSpace: 'nowrap' }}>
-                    {group.label}
+                {timelineGroups.map((group, groupIndex) => (
+                  <div key={groupIndex} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', position: 'relative', zIndex: 1 }}>
+                    
+                    {/* Year Label */}
+                    <div style={{ position: 'absolute', top: '-3rem', fontWeight: 'bold', fontSize: '1.2rem', color: '#000', whiteSpace: 'nowrap' }}>
+                      {group.label}
+                    </div>
+                    
+                    {/* Branching vertical line for overlapping events */}
+                    {group.items.length > 1 && (
+                      <div style={{
+                        position: 'absolute',
+                        left: '50%',
+                        top: '30px',
+                        bottom: '30px',
+                        width: '4px',
+                        backgroundColor: '#808080',
+                        borderLeft: '2px solid #dfdfdf',
+                        borderRight: '2px solid #dfdfdf',
+                        transform: 'translateX(-50%)',
+                        zIndex: -1
+                      }} />
+                    )}
+                    
+                    {/* Group nodes */}
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '3rem', position: 'relative' }}>
+                      {group.items.map((item, itemIndex) => (
+                        <TimelineNode 
+                          key={itemIndex} 
+                          item={item} 
+                          onClick={() => openNode(item.index)} 
+                        />
+                      ))}
+                    </div>
                   </div>
-                  
-                  {/* Branching vertical line for overlapping events */}
-                  {group.items.length > 1 && (
-                    <div style={{
-                      position: 'absolute',
-                      left: '50%',
-                      top: '30px',
-                      bottom: '30px',
-                      width: '4px',
-                      backgroundColor: '#808080',
-                      borderLeft: '2px solid #dfdfdf',
-                      borderRight: '2px solid #dfdfdf',
-                      transform: 'translateX(-50%)',
-                      zIndex: -1
-                    }} />
-                  )}
-                  
-                  {/* Group nodes */}
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '3rem', position: 'relative' }}>
-                    {group.items.map((item, itemIndex) => (
-                      <TimelineNode 
-                        key={itemIndex} 
-                        item={item} 
-                        onClick={() => openNode(item.index)} 
-                      />
-                    ))}
+                ))}
+              </div>
+            </div>
+
+            {/* Mobile Vertical View (scrolls downwards) */}
+            <div className="timeline-mobile-layout">
+              <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', gap: '1.5rem', width: '100%' }}>
+                
+                {/* Continuous vertical connecting line */}
+                <div style={{
+                  position: 'absolute',
+                  left: '23px',
+                  top: '12px',
+                  bottom: '12px',
+                  width: '4px',
+                  backgroundColor: '#808080',
+                  borderLeft: '2px solid #dfdfdf',
+                  borderRight: '2px solid #dfdfdf',
+                  zIndex: 0
+                }} />
+
+                {mobileTimelineGroups.map((group, groupIndex) => (
+                  <div key={groupIndex} style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', position: 'relative', zIndex: 1 }}>
+                    
+                    {/* Year Header Badge */}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <div className="convex" style={{
+                        backgroundColor: '#000080',
+                        color: '#fff',
+                        padding: '2px 8px',
+                        fontSize: '0.85rem',
+                        fontWeight: 'bold',
+                        letterSpacing: '0.5px',
+                        zIndex: 2,
+                        boxShadow: '1px 1px 0px rgba(0,0,0,0.5)',
+                        flexShrink: 0
+                      }}>
+                        {group.label}
+                      </div>
+                      <div style={{ height: '2px', flex: 1, backgroundColor: '#808080', borderBottom: '1px solid #fff' }} />
+                    </div>
+
+                    {/* Group Items */}
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                      {group.items.map((item, itemIndex) => (
+                        <div 
+                          key={itemIndex}
+                          onClick={() => openNode(item.index)}
+                          className="convex timeline-mobile-card"
+                          style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '10px',
+                            padding: '6px 8px',
+                            backgroundColor: '#c0c0c0',
+                            cursor: 'pointer',
+                            position: 'relative',
+                            zIndex: 1,
+                            userSelect: 'none'
+                          }}
+                        >
+                          {/* Hexagon Node Icon */}
+                          <div style={{ flexShrink: 0, width: '46px', height: '46px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                            <div style={{
+                              width: '44px',
+                              height: '44px',
+                              clipPath: 'polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)',
+                              display: 'flex',
+                              justifyContent: 'center',
+                              alignItems: 'center',
+                              background: 'linear-gradient(135deg, #fff 0%, #c0c0c0 40%, #808080 100%)',
+                              boxShadow: 'inset 2px 2px 4px rgba(255,255,255,0.8)'
+                            }}>
+                              {getLogoContent(item.pos.company, 24)}
+                            </div>
+                          </div>
+
+                          {/* Node Information */}
+                          <div style={{ flex: 1, minWidth: 0 }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', flexWrap: 'wrap', gap: '2px' }}>
+                              <span style={{ fontWeight: 'bold', fontSize: '0.95rem', color: '#000' }}>
+                                {item.pos.company}
+                              </span>
+                              <span style={{ fontSize: '0.7rem', color: '#333', backgroundColor: '#e0e0e0', padding: '1px 4px', border: '1px solid #808080' }}>
+                                {item.pos.date}
+                              </span>
+                            </div>
+                            <div style={{ fontSize: '0.8rem', color: '#222', marginTop: '1px', fontWeight: '500' }}>
+                              {item.pos.title}
+                            </div>
+                            {item.pos.tags && (
+                              <div style={{ display: 'flex', gap: '3px', flexWrap: 'wrap', marginTop: '3px' }}>
+                                {item.pos.tags.slice(0, 3).map((t: any, ti: number) => (
+                                  <span key={ti} style={{ fontSize: '0.65rem', backgroundColor: t.starred ? '#ffffe1' : '#dfdfdf', border: '1px solid #808080', padding: '0px 3px', color: '#000' }}>
+                                    {t.name}
+                                  </span>
+                                ))}
+                                {item.pos.tags.length > 3 && (
+                                  <span style={{ fontSize: '0.65rem', color: '#555', alignSelf: 'center' }}>+{item.pos.tags.length - 3}</span>
+                                )}
+                              </div>
+                            )}
+                          </div>
+
+                          {/* Right Arrow indicator */}
+                          <div style={{ fontSize: '1.1rem', color: '#000080', fontWeight: 'bold', paddingRight: '2px', flexShrink: 0 }}>
+                            ›
+                          </div>
+                        </div>
+                      ))}
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
           </div>
         ) : (
-          <div style={{ flex: 1, margin: '4px', overflowY: 'auto' }}>
-            <Position {...positions[parseInt(activeTab.split('-')[1])]} />
+          <div style={{ flex: 1, margin: '4px', overflowY: 'auto', display: 'flex', flexDirection: 'column', minHeight: 0 }}>
+            {/* Back button for easy mobile navigation */}
+            <div style={{ padding: '2px 4px 6px 4px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <button 
+                className="convex" 
+                onClick={() => setActiveTab('overview')}
+                style={{
+                  padding: '3px 8px',
+                  fontSize: '0.8rem',
+                  backgroundColor: '#c0c0c0',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '4px',
+                  cursor: 'pointer',
+                  color: '#000',
+                  fontWeight: 'bold'
+                }}
+              >
+                ◀ Back to Timeline
+              </button>
+            </div>
+            <div style={{ flex: 1, minHeight: 0 }}>
+              <Position {...positions[parseInt(activeTab.split('-')[1])]} />
+            </div>
           </div>
         )}
       </div>
