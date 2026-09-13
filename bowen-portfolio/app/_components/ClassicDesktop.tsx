@@ -149,6 +149,7 @@ export default function ClassicDesktop() {
               <Image
                 className="startbutton"
                 src={startButtonIcon}
+                style={{ width: 'auto' }}
                 alt="Windows start button"
               ></Image>
             </button>

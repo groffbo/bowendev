@@ -160,7 +160,7 @@ function Page() {
             Experience
           </button>
           <button className="icon" onClick={() => addWindow("paint", "Paint")}>
-            <Image src={paintIcon} alt="" width={64} height={64} style={{ width: '64px', maxWidth: '100%', height: 'auto', imageRendering: 'pixelated' }} />
+            <Image src={paintIcon} alt="" loading="eager" style={{ width: '64px', maxWidth: '100%', height: 'auto', imageRendering: 'pixelated' }} />
             Paint
           </button>
         </div>
@@ -170,6 +170,7 @@ function Page() {
             <Image
               className="startbutton"
               src={startButtonIcon}
+              style={{ width: 'auto' }}
               alt="Windows start button"
             ></Image>
           </button>
@@ -190,6 +191,7 @@ function Page() {
       {windows.map((w) =>
         w.isOpen ? (
           <Window
+            className={w.id === 'welcome-mobile' ? 'mobile-welcome-window' : undefined}
             key={w.id}
             title={w.title}
             startX={w.startX}
@@ -207,6 +209,7 @@ function Page() {
                     width={250}
                     height={250}
                     src={photo}
+                    style={{ objectFit: 'contain', height: 'auto' }}
                     alt="Photo of person"
                   />
                   <span className="text" style={{ flex: 1, marginTop: 0 }}>
@@ -234,10 +237,11 @@ function Page() {
                 </Image> */}
               </>
             ) : w.id === "welcome-mobile" ? (
-              <div style={{ padding: "8px", display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", height: "100%" }}>
-                <h1 style={{ fontSize: "1.2rem", fontWeight: "bold", marginBottom: "8px" }}></h1>
-                <p style={{marginBottom: "10px"}}>Take a look around!</p>
-                <button className="convex" onClick={() => toggleWindow("welcome-mobile")} style={{width: "50px", padding: "5px"}}>Ok</button>
+              <div style={{ padding: "20px 16px", display: "flex", flexDirection: "column", alignItems: "center", gap: "12px", textAlign: "center", color: '#000' }}>
+                <Image src={photo} alt="Bowen Groff" loading="eager" style={{ width: '112px', height: '112px', objectFit: 'cover', flexShrink: 0, border: '2px inset #fff' }} />
+                <h1 style={{ fontSize: "1.25rem", fontWeight: "bold", margin: 0 }}>Welcome to My Desktop!</h1>
+                <p style={{ fontSize: '1rem', lineHeight: 1.5, margin: 0 }}>I’m Bowen — previously at AMD, studying Computer Engineering at UCF, and researching in UCF’s iCAT lab.</p>
+                <button className="convex" onClick={() => toggleWindow("welcome-mobile")} style={{ padding: "8px 20px", fontSize: '1rem' }}>Explore</button>
               </div>
             
             ) : w.id === "timeline" ? (

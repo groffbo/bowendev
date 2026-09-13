@@ -74,10 +74,22 @@ export default function TimelineWindow() {
         .experience-bar:hover { filter:brightness(1.2); box-shadow:0 0 0 2px #000; z-index:2; }
         .experience-bar span { position:sticky; left:calc(var(--label-width) + 8px); }
         .current-month-line { position:absolute; top:0; bottom:0; border-left:2px dashed #b34700; pointer-events:none; z-index:1; }
+        .mobile-experience-list { display:none; }
         .timeline-details { flex:1; min-height:0; display:flex; flex-direction:column; }
+        @media(max-width:768px) {
+          .desktop-experience-overview, .timeline-details { display:none !important; }
+          .mobile-experience-list { display:block; overflow-y:auto; overflow-x:hidden; flex:1; min-height:0; padding:10px; }
+          .mobile-experience-list h2 { margin:0 0 8px; font-size:1rem; color:#000080; }
+          .mobile-experience-list section { margin-bottom:20px; }
+          .mobile-experience-list details { background:#f5f5ed; border:2px inset #fff; margin-bottom:8px; }
+          .mobile-experience-list summary { cursor:pointer; padding:12px; font-size:1rem; line-height:1.4; }
+          .mobile-experience-list summary span { display:block; font-size:0.875rem; color:#444; margin-top:4px; }
+          .mobile-experience-list summary:focus-visible { outline:2px solid #000080; }
+          .mobile-experience-list details p { margin:0; padding:0 12px 12px; font-size:1rem; line-height:1.5; overflow-wrap:anywhere; }
+        }
         @media(max-width:600px) { .experience-chart { --label-width:155px; } .chart-label { padding:8px; } .chart-row { min-height:90px; } .experience-bar { top:23px; } }
       `}</style>
-      <div style={{ display: activePosition === null ? 'flex' : 'none', flexDirection: 'column', flex: 1, minHeight: 0 }}>
+      <div className="desktop-experience-overview" style={{ display: activePosition === null ? 'flex' : 'none', flexDirection: 'column', flex: 1, minHeight: 0 }}>
         <nav className="timeline-toolbar" aria-label="Timeline navigation">
           <strong style={{ fontSize: '0.875rem' }}>Jump to</strong>
           {years.map(year => <button key={year} className="convex" onClick={() => jumpTo(year * 12)}>{year}</button>)}
@@ -120,6 +132,15 @@ export default function TimelineWindow() {
             </React.Fragment>)}
           </div>
         </div>
+      </div>
+      <div className="mobile-experience-list" aria-label="Experience list">
+        {groups.map(group => <section key={group.company}>
+          <h2>{companyLabel(group.company)}</h2>
+          {[...group.roles].reverse().map(({ pos, index }) => <details key={index}>
+            <summary><strong>{pos.title}</strong><span>{pos.date}</span></summary>
+            <p>{pos.description}</p>
+          </details>)}
+        </section>)}
       </div>
       {activePosition !== null && <div className="timeline-details">
         <div className="timeline-toolbar"><button className="convex" onClick={() => setActivePosition(null)}>◀ Back to timeline</button></div>

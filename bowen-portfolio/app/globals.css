@@ -294,3 +294,9 @@ button {
     height: 1.2rem;
   }
 }
+@media (max-width: 768px) {
+  .window.mobile-welcome-window {
+    width: min(92vw, 360px) !important;
+    height: min(410px, 82dvh) !important;
+  }
+}

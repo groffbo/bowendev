@@ -9,6 +9,7 @@
 import { useEffect, useRef, useState } from "react";
 
 interface WindowProps {
+  className?: string;
   title: string;
   children: React.ReactNode;
   startX?: number;
@@ -20,6 +21,7 @@ interface WindowProps {
 }
 
 export default function Window({
+  className = "",
   title,
   children,
   startX = 100,
@@ -87,7 +89,7 @@ export default function Window({
   return (
     <div
       ref={windowRef}
-      className="convex window"
+      className={`convex window ${className}`}
       style={style}
     >
       <div className="window-header" onMouseDown={startDrag}>
