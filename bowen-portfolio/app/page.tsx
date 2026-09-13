@@ -14,6 +14,8 @@ import Image from "next/image";
 import Window from "./_components/window";
 import TimelineWindow, { positions } from "./_components/TimelineWindow";
 import Position from "./_components/Position";
+import PaintWindow from "./_components/PaintWindow";
+import paintIcon from "./assets/paint.png";
 
 import "./globals.css";
 
@@ -102,7 +104,7 @@ function Page() {
       id,
       title: customTitle || "Experience",
       isOpen: true,
-      ...(isMobile
+      ...(id === "paint" ? { width: 800, height: 760, center: true } : isMobile
         ? { width: 350, height: 500, center: true }
         : { startX: 400, startY: 200, width: 800, height: 600 }),
     };
@@ -156,6 +158,10 @@ function Page() {
           >
             <Image src={skills} alt="Skills icon"></Image>
             Experience
+          </button>
+          <button className="icon" onClick={() => addWindow("paint", "Paint")}>
+            <Image src={paintIcon} alt="" width={64} height={64} style={{ width: '64px', maxWidth: '100%', height: 'auto', imageRendering: 'pixelated' }} />
+            Paint
           </button>
         </div>
 
@@ -236,6 +242,8 @@ function Page() {
             
             ) : w.id === "timeline" ? (
               <TimelineWindow />
+            ) : w.id === "paint" ? (
+              <PaintWindow />
             ) : (
               <p></p>
             )}

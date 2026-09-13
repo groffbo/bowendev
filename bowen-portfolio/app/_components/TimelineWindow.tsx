@@ -1,605 +1,130 @@
-/**
- * File: TimelineWindow.tsx
- * Project: Bowen Groff Dev Team Submission
- * Author: Bowen Groff
- * Date: September 14, 2025
- * Description: This file contains the timeline of positions and a tabbed interface.
- */
+"use client";
 
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import Position from './Position';
+import { positions as portfolioPositions } from './portfolio-data';
 
-export const positions = [
-  {
-    title: "GPU Intern",
-    company: "AMD",
-    date: "Jan 2026 - Present",
-    location: "Orlando, FL",
-    description: "While interning at AMD, I have had the chance to work with something that I genuinely wish to spend the rest of my career involved in. GPUs! Under the DCGPU team in Orlando, FL, I have ported/written around 4 different major kernels into a testbench suite called COMPETEs. Those specific kernels being async load/store, unroll optimization, atomic, and launch latency. I have gotten my hands dirty with advanced C++ metaprogramming, including writing a nested lambda with templates to unroll all combinations of a kernel at compile-time!",
-    tags: [
-      { name: "C++", starred: true },
-      { name: "HIP", starred: false },
-      { name: "ROCm", starred: false },
-      { name: "GPU Architecture", starred: true },
-      { name: "Metaprogramming", starred: false },
-      { name: "Design Patterns", starred: false },
-      { name: "Kernel Development", starred: true},
-    ],
-  },
-  {
-    title: "Design Director",
-    company: "Knight Hacks",
-    date: "Feb 2026 - Present",
-    location: "Orlando, FL",
-    description: "I am currently leading a team of 15+ designers with individual expertise in fields such as UI/UX, Figma, graphic design, illustration, animation, etc. Leveraging each of their strengths, our team has shipped 15+ flyers seen by hundreds of students, created club shirt designs, and crafted a club website figma all within the first month of my time as director.",
-    tags: [
-      { name: "Figma", starred: false },
-      { name: "UI/UX", starred: false },
-      { name: "Leadership", starred: true },
-      { name: "Adobe Fresco", starred: false },
-      { name: "Adobe Illustrator", starred: false },
-      { name: "Clip Studio Paint", starred: true },
-    ],
-  },
-  {
-    title: "Project Lead",
-    company: "IEEE UCF",
-    date: "Oct 2025 - Present",
-    location: "Orlando, FL",
-    description: "Leading a team of 5+ students at UCF to create a member dashboard for 300+ IEEE UCF members. Held workshops to teach team members about git, React.js, and web development as a whole. Oversaw 10+ pull requests to a production branch. Website entered in 2026 IEEE Southeast Convention Competition.",
-    tags: [
-      { name: "Project Management", starred: true },
-      { name: "React", starred: false },
-      { name: "Node.js", starred: false },
-      { name: "System Design", starred: true },
-    ],
-  },
-  {
-    title: "Development Team Member",
-    company: "Knight Hacks",
-    date: "Sep 2025 - Present",
-    location: "Orlando, FL",
-    description: "Currently contributing to Knight Hacks' monorepo, Forge, alongside a team of 16+ developers. Developed the backend for a judging system used in KHVIII and beyond with 0% downtime and over 100 projects judged. Created a cron job to automatically role assign members a club alumni discord role depending on their graduation date in our database. Engineered a self-hosted form homepage with csv export option and qr code generation per form. ",
-    tags: [
-      { name: "React", starred: true },
-      { name: "Next.js", starred: true },
-      { name: "TypeScript", starred: true },
-      { name: "Monorepo", starred: false },
-      { name: "Discord.js", starred: false },
-      { name: "TRPC", starred: false },
-      { name: "Drizzle", starred: false },
-      { name: "Shadcn", starred: false },
-      { name: "Tailwind CSS", starred: false},
-    ],
-  },
-  {
-    title: "Software Engineering Intern",
-    company: "L3Harris",
-    date: "May 2024 - Nov 2025",
-    location: "Colorado Springs, CO, Remote",
-    description: "In the first part of the year, I overhauled a CLI to a React.js webpage for deep space telescope operators to utilize when generating .FITS files. During the following summer, I developed a kernel driver in C and C++ to send critical avionic messages bidirectionally from fibre channel to ethernet. The kernel driver mapped memory blocks directly to userspace and generated tables to sort messages into. Tables contained information down to bit-widths, and around 27 unique message types were utilized. From these 27, over 800+ message buffers existed inside of these tables.",
-    tags: [
-      { name: "C++", starred: false },
-      { name: "C", starred: true },
-      { name: "Kernel Driver", starred: false },
-      { name: "Linux", starred: true },
-      { name: "Low-level programming", starred: false },
-    ],
-  },
-  {
-    title: "Software Engineering Intern",
-    company: "L3Harris",
-    date: "May 2023 - Aug 2023",
-    location: "Melbourne, FL",
-    description: "During my first summer at L3Harris, I worked with a team of 4 other interns to create a predictive analysis tool, lovingly called PAT. PAT was trained on an extremely small dataset of <1000 failure modes, with an overall accuracy of ~68%. This was accomplished by using 3 separate ML models to analyze the data in 3 different ways. My particular model was a word frequency model, which took note of any patterns between the amount of times a word showed up in an entry and its final failure mode. Additionally, I created a Jenkins pipeline to retrain the model nightly on any new data in the database.",
-    tags: [
-        { name: "Python", starred: true },
-        { name: "Jenkins", starred: true },
-        { name: "Pytorch", starred: false },
-        { name: "Pandas", starred: false },
-        { name: "Tensorflow", starred: false },
-        { name: "Keras", starred: false },
-        { name: "Machine Learning", starred: true },
-    ],
-  },
-];
+export const positions = portfolioPositions.map(position => ({
+  ...position,
+  tags: position.tags.map(name => ({ name, starred: ['C++20', 'GPU Architecture', 'Kernel Development', 'Leadership', 'Clip Studio Paint', 'Project Management', 'System Design', 'React', 'Next.js', 'TypeScript', 'C', 'Linux', 'Python', 'Jenkins', 'Machine Learning'].includes(name) })),
+}));
 
-const timelineGroups = [
-  {
-    label: "2023",
-    items: [
-      { pos: positions[5], index: 5 } // Summer 2023
-    ]
-  },
-  {
-    label: "2024",
-    items: [
-      { pos: positions[4], index: 4 } // May 2024
-    ]
-  },
-  {
-    label: "2025",
-    items: [
-      { pos: positions[3], index: 3 }, // Sep 2025
-      { pos: positions[2], index: 2 }  // Oct 2025
-    ]
-  },
-  {
-    label: "2026",
-    items: [
-      { pos: positions[0], index: 0 }, // Jan 2026
-      { pos: positions[1], index: 1 }  // Feb 2026
-    ]
-  }
-];
-
-// Most recent experiences first (2026 -> 2023) for vertical scrolling on mobile
-const mobileTimelineGroups = [
-  {
-    label: "2026 (Present)",
-    items: [
-      { pos: positions[1], index: 1 }, // Feb 2026 - Knight Hacks Design Director
-      { pos: positions[0], index: 0 }  // Jan 2026 - AMD GPU Intern
-    ]
-  },
-  {
-    label: "2025",
-    items: [
-      { pos: positions[2], index: 2 }, // Oct 2025 - IEEE UCF Project Lead
-      { pos: positions[3], index: 3 }  // Sep 2025 - Knight Hacks Dev Team
-    ]
-  },
-  {
-    label: "2024",
-    items: [
-      { pos: positions[4], index: 4 } // May 2024 - L3Harris Intern
-    ]
-  },
-  {
-    label: "2023",
-    items: [
-      { pos: positions[5], index: 5 } // Summer 2023 - L3Harris Intern
-    ]
-  }
-];
-
-const getLogoContent = (company: string, size = 32) => {
-  if (company.includes('AMD')) return <img src="https://cdn.simpleicons.org/amd/000000" alt="AMD" style={{ width: `${size}px`, height: `${size}px` }} />;
-  if (company.includes('IEEE')) return <img src="https://cdn.simpleicons.org/ieee/000000" alt="IEEE" style={{ width: `${size}px`, height: `${size}px` }} />;
-  if (company.includes('Knight Hacks')) return <span style={{ fontSize: `${size * 0.45}px`, fontWeight: 'bold' }}>KH</span>;
-  if (company.includes('L3Harris')) return <span style={{ fontSize: `${size * 0.45}px`, fontWeight: 'bold' }}>L3H</span>;
-  return <span style={{ fontSize: `${size * 0.45}px`, fontWeight: 'bold' }}>{company.substring(0, 3).toUpperCase()}</span>;
+const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+const monthIndex = (date: string) => {
+  const [month, year] = date.split(' ');
+  return Number(year) * 12 + months.indexOf(month);
 };
+const firstMonth = Math.floor(Math.min(...positions.map(pos => monthIndex(pos.date.split(' - ')[0]))) / 12) * 12;
+const lastStart = Math.max(...positions.map(pos => monthIndex(pos.date.split(' - ')[0])));
+const companyLabel = (company: string) => company.startsWith('UCF Department') ? 'UCF · iCAT Lab' : company;
+const barColor = (company: string) => company.startsWith('UCF') ? '#663399' : company === 'AMD' ? '#94351e' : company.includes('Knight') ? '#000080' : company.includes('IEEE') ? '#00665f' : '#405577';
 
-const TimelineNode = ({ item, onClick }: { item: { pos: any, index: number }, onClick: () => void }) => {
-  const [hovered, setHovered] = useState(false);
-  
+export default function TimelineWindow() {
+  const [activePosition, setActivePosition] = useState<number | null>(null);
+  const [currentMonth, setCurrentMonth] = useState(lastStart);
+  const monthWidth = 44;
+  const scroller = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const now = new Date();
+    const month = Math.max(lastStart, now.getFullYear() * 12 + now.getMonth());
+    setCurrentMonth(month);
+    if (scroller.current) scroller.current.scrollLeft = (Math.floor(month / 12) * 12 - firstMonth) * 44;
+  }, []);
+
+  const finalMonth = Math.floor(currentMonth / 12) * 12 + 11;
+  const monthCount = finalMonth - firstMonth + 1;
+  const years = Array.from({ length: monthCount / 12 }, (_, i) => firstMonth / 12 + i);
+  const groups = Array.from(new Set(positions.map(pos => pos.company))).map(company => ({
+    company,
+    roles: positions.map((pos, index) => ({ pos, index })).filter(item => item.pos.company === company)
+      .sort((a, b) => monthIndex(a.pos.date.split(' - ')[0]) - monthIndex(b.pos.date.split(' - ')[0])),
+  })).sort((a, b) => Math.max(...b.roles.map(item => monthIndex(item.pos.date.split(' - ')[0]))) - Math.max(...a.roles.map(item => monthIndex(item.pos.date.split(' - ')[0]))));
+  const jumpTo = (month: number) => scroller.current?.scrollTo({ left: (month - firstMonth) * monthWidth, behavior: 'smooth' });
+
   return (
-    <div 
-      className="timeline-node-container" 
-      style={{ 
-        position: 'relative', 
-        display: 'flex', 
-        flexDirection: 'column', 
-        alignItems: 'center',
-        animation: 'float 3s ease-in-out infinite',
-        animationDelay: `${item.index * 0.3}s`
-      }}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-    >
-      <button 
-        onClick={onClick}
-        style={{
-          width: '60px',
-          height: '60px',
-          padding: 0,
-          border: 'none',
-          clipPath: 'polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)',
-          cursor: 'pointer',
-          overflow: 'hidden',
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          background: 'linear-gradient(135deg, #fff 0%, #c0c0c0 40%, #808080 100%)',
-          color: '#000',
-          boxShadow: 'inset 2px 2px 4px rgba(255,255,255,0.8)'
-        }}
-      >
-        {getLogoContent(item.pos.company, 32)}
-      </button>
-      
-      {hovered && (
-        <div className="convex" style={{
-          position: 'absolute',
-          top: '70px',
-          backgroundColor: '#ffffe1',
-          border: '1px solid #000',
-          padding: '4px 8px',
-          zIndex: 10,
-          width: 'max-content',
-          maxWidth: '200px',
-          textAlign: 'center',
-          boxShadow: '2px 2px 0px rgba(0,0,0,0.5)',
-          color: '#000'
-        }}>
-          <strong>{item.pos.company}</strong>
-          <br />
-          <span style={{ fontSize: '0.8rem' }}>{item.pos.title}</span>
+    <div className="experience-timeline">
+      <style>{`
+        .experience-timeline { height:100%; min-height:0; display:flex; flex-direction:column; color:#000; background:#c0c0c0; padding:4px; }
+        .experience-timeline button { font-family:inherit; cursor:pointer; }
+        .experience-timeline button:focus-visible, .experience-chart:focus-visible { outline:3px solid #d17300; outline-offset:-3px; }
+        .timeline-toolbar { display:flex; flex-wrap:wrap; align-items:center; gap:6px; padding:8px; flex-shrink:0; }
+        .timeline-toolbar button { padding:4px 10px; color:#000; font-size:0.875rem; background:#c0c0c0; }
+        .timeline-hint { margin:0; padding:0 8px 8px; font-size:0.875rem; color:#333; }
+        .experience-chart { --label-width:210px; overflow:auto; flex:1; min-height:0; border:2px inset #eee; background:#fff; position:relative; }
+        .chart-content { width:calc(var(--label-width) + var(--chart-width)); min-height:100%; }
+        .chart-header { display:flex; position:sticky; top:0; z-index:5; height:64px; background:#c0c0c0; }
+        .chart-corner { position:sticky; left:0; z-index:6; width:var(--label-width); flex-shrink:0; display:flex; align-items:center; padding:12px; background:#c0c0c0; border-right:2px solid #666; border-bottom:2px solid #666; font-size:1rem; }
+        .chart-years { display:flex; }
+        .chart-year { box-shadow:inset 2px 0 #666; box-sizing:border-box; }
+        .chart-year strong { display:block; height:32px; padding:4px 8px; color:#fff; background:#000080; font-size:1rem; }
+        .chart-year:nth-child(even) strong { background:#005b5b; }
+        .chart-months { display:flex; height:32px; }
+        .chart-months span { flex-shrink:0; text-align:center; padding-top:5px; font-size:0.875rem; border-right:1px solid #aaa; }
+        .chart-row { display:flex; min-height:78px; }
+        .chart-group { display:flex; height:30px; background:#ddd; border-top:2px solid #808080; }
+        .chart-group strong { position:sticky; left:0; width:var(--label-width); padding:4px 10px; background:#ddd; font-size:0.875rem; border-right:2px solid #666; }
+        .chart-label { position:sticky; left:0; z-index:3; flex-shrink:0; width:var(--label-width); padding:10px; background:#eee; color:#000; border:0; border-bottom:1px solid #aaa; border-right:2px solid #666; text-align:left; display:flex; flex-direction:column; gap:4px; }
+        .chart-label strong { font-size:0.875rem; color:#000080; }
+        .chart-label span { font-size:0.875rem; line-height:1.3; }
+        .chart-label small { font-size:0.75rem; color:#444; }
+        .chart-label:hover { background:#ffffe1; }
+        .chart-track { position:relative; flex-shrink:0; border-bottom:1px solid #ccc; background-color:#fafaf3; background-image:linear-gradient(to right,#808080 2px,transparent 2px),linear-gradient(to right,#ddd 1px,transparent 1px); background-size:calc(var(--month-width) * 12) 100%,var(--month-width) 100%; }
+        .chart-row:nth-child(even) .chart-track { background-color:#f0f0e8; }
+        .experience-bar { position:absolute; top:17px; height:44px; border:2px outset #ddd; color:#fff; text-align:left; padding:6px; white-space:nowrap; overflow:hidden; font-size:0.875rem; }
+        .experience-bar:hover { filter:brightness(1.2); box-shadow:0 0 0 2px #000; z-index:2; }
+        .experience-bar span { position:sticky; left:calc(var(--label-width) + 8px); }
+        .current-month-line { position:absolute; top:0; bottom:0; border-left:2px dashed #b34700; pointer-events:none; z-index:1; }
+        .timeline-details { flex:1; min-height:0; display:flex; flex-direction:column; }
+        @media(max-width:600px) { .experience-chart { --label-width:155px; } .chart-label { padding:8px; } .chart-row { min-height:90px; } .experience-bar { top:23px; } }
+      `}</style>
+      <div style={{ display: activePosition === null ? 'flex' : 'none', flexDirection: 'column', flex: 1, minHeight: 0 }}>
+        <nav className="timeline-toolbar" aria-label="Timeline navigation">
+          <strong style={{ fontSize: '0.875rem' }}>Jump to</strong>
+          {years.map(year => <button key={year} className="convex" onClick={() => jumpTo(year * 12)}>{year}</button>)}
+          <button className="convex" onClick={() => jumpTo(currentMonth - 3)}>Present</button>
+
+        </nav>
+        <p className="timeline-hint">Select a role for details · Dashed line: current month</p>
+        <div className="experience-chart" ref={scroller} tabIndex={0} role="region" aria-label="Experience timeline by month. Each row is a role; aligned bars show overlapping work.">
+          <div className="chart-content" style={{ '--chart-width': `${monthCount * monthWidth}px`, '--month-width': `${monthWidth}px` } as React.CSSProperties}>
+            <div className="chart-header">
+              <div className="chart-corner">Experience</div>
+              <div className="chart-years">
+                {years.map(year => <div key={year} className="chart-year" style={{ width: monthWidth * 12 }}>
+                  <strong>{year}</strong>
+                  <div className="chart-months">{months.map(month => <span key={month} style={{ width: monthWidth }}>{month}</span>)}</div>
+                </div>)}
+              </div>
+            </div>
+            {groups.map(group => <React.Fragment key={group.company}>
+              <div className="chart-group"><strong>{companyLabel(group.company)}</strong></div>
+              {group.roles.map(({ pos, index }) => {
+              const [start, end] = pos.date.split(' - ');
+              const startMonth = monthIndex(start);
+              const ongoing = end === 'Present';
+              const endMonth = ongoing ? currentMonth : monthIndex(end);
+              const label = `${pos.title} at ${pos.company}, ${pos.date}. View full experience`;
+              return <div className="chart-row" key={index}>
+                <button className="chart-label" onClick={() => setActivePosition(index)} aria-label={label}>
+                  <span>{pos.title}</span>
+                  <small>{pos.date}</small>
+                </button>
+                <div className="chart-track" style={{ width: monthCount * monthWidth }}>
+                  <div className="current-month-line" style={{ left: (currentMonth - firstMonth) * monthWidth }} />
+                  <button className="experience-bar" title={label} aria-label={label} onClick={() => setActivePosition(index)} style={{ left: (startMonth - firstMonth) * monthWidth, width: (endMonth - startMonth + 1) * monthWidth, backgroundColor: barColor(pos.company), borderRightStyle: ongoing ? 'dashed' : 'outset' }}>
+                    <span>{pos.title === "Development Team Member" ? "Developer" : pos.title}{ongoing ? ' →' : ''}</span>
+                  </button>
+                </div>
+              </div>;
+              })}
+            </React.Fragment>)}
+          </div>
         </div>
-      )}
+      </div>
+      {activePosition !== null && <div className="timeline-details">
+        <div className="timeline-toolbar"><button className="convex" onClick={() => setActivePosition(null)}>◀ Back to timeline</button></div>
+        <div style={{ flex: 1, minHeight: 0 }}><Position {...positions[activePosition]} /></div>
+      </div>}
     </div>
   );
-};
-
-const TimelineWindow = () => {
-  const [tabs, setTabs] = useState<{ id: string, title: string }[]>([
-    { id: 'overview', title: 'Overview' }
-  ]);
-  const [activeTab, setActiveTab] = useState('overview');
-
-  const openNode = (index: number) => {
-    const pos = positions[index];
-    const tabId = `exp-${index}`;
-    if (!tabs.find(t => t.id === tabId)) {
-      setTabs([...tabs, { id: tabId, title: pos.company }]);
-    }
-    setActiveTab(tabId);
-  };
-
-  const closeTab = (id: string, e: React.MouseEvent) => {
-    e.stopPropagation();
-    const newTabs = tabs.filter(t => t.id !== id);
-    setTabs(newTabs);
-    if (activeTab === id) {
-      setActiveTab('overview');
-    }
-  };
-
-  return (
-    <div style={{
-      backgroundColor: '#c0c0c0',
-      height: '100%',
-      display: 'flex',
-      flexDirection: 'column',
-      padding: '4px'
-    }}>
-      <style>
-        {`
-          @keyframes float {
-            0% { transform: translateY(0px); }
-            50% { transform: translateY(-8px); }
-            100% { transform: translateY(0px); }
-          }
-          .win95-tabs-container {
-            display: flex;
-            gap: 2px;
-            padding-left: 4px;
-            overflow-x: auto;
-            overflow-y: hidden;
-            white-space: nowrap;
-            -webkit-overflow-scrolling: touch;
-            scrollbar-width: thin;
-          }
-          .win95-tabs-container::-webkit-scrollbar {
-            height: 4px;
-          }
-          .win95-tabs-container::-webkit-scrollbar-thumb {
-            background: #808080;
-          }
-          .win95-tab {
-            padding: 4px 10px;
-            background-color: #c0c0c0;
-            border-top-left-radius: 3px;
-            border-top-right-radius: 3px;
-            border-top: 2px solid #dfdfdf;
-            border-left: 2px solid #dfdfdf;
-            border-right: 2px solid #808080;
-            cursor: pointer;
-            margin-bottom: -2px;
-            position: relative;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            font-size: 0.85rem;
-            flex-shrink: 0;
-            user-select: none;
-          }
-          .win95-tab.active {
-            border-bottom: 2px solid #c0c0c0;
-            z-index: 2;
-            padding-top: 6px;
-            margin-top: -2px;
-            font-weight: bold;
-          }
-          .win95-tab.inactive {
-            border-bottom: 2px solid #808080;
-            z-index: 1;
-            margin-top: 2px;
-          }
-          .timeline-desktop-layout {
-            display: flex;
-            align-items: center;
-            flex: 1;
-            overflow-x: auto;
-            overflow-y: auto;
-          }
-          .timeline-mobile-layout {
-            display: none;
-          }
-          .timeline-mobile-card:active {
-            border-top: 2px solid gray !important;
-            border-left: 2px solid gray !important;
-            border-right: 2px solid #fff !important;
-            border-bottom: 2px solid #fff !important;
-            background-color: #b0b0b0 !important;
-          }
-          @media (max-width: 768px) {
-            .timeline-desktop-layout {
-              display: none !important;
-            }
-            .timeline-mobile-layout {
-              display: flex !important;
-              flex-direction: column;
-              flex: 1;
-              overflow-y: auto;
-              overflow-x: hidden;
-              padding: 1rem 0.5rem 1.5rem 0.5rem;
-            }
-          }
-        `}
-      </style>
-
-      {/* Tabs Header */}
-      <div className="win95-tabs-container">
-        {tabs.map(tab => (
-          <div 
-            key={tab.id}
-            className={`win95-tab ${activeTab === tab.id ? 'active' : 'inactive'}`}
-            onClick={() => setActiveTab(tab.id)}
-          >
-            {tab.title}
-            {tab.id !== 'overview' && (
-              <button 
-                onClick={(e) => closeTab(tab.id, e)}
-                style={{
-                  border: 'none',
-                  background: 'transparent',
-                  fontWeight: 'bold',
-                  cursor: 'pointer',
-                  padding: '0',
-                  marginLeft: '4px',
-                  color: '#000'
-                }}
-              >
-                X
-              </button>
-            )}
-          </div>
-        ))}
-      </div>
-
-      {/* Tab Content Area */}
-      <div className="convex" style={{
-        flex: 1,
-        borderTop: '2px solid #dfdfdf',
-        borderLeft: '2px solid #dfdfdf',
-        borderRight: '2px solid #808080',
-        borderBottom: '2px solid #808080',
-        backgroundColor: '#c0c0c0',
-        overflow: 'hidden',
-        display: 'flex',
-        flexDirection: 'column',
-        minHeight: 0
-      }}>
-        {activeTab === 'overview' ? (
-          <div className="concave" style={{
-            flex: 1,
-            margin: '4px',
-            overflow: 'hidden',
-            backgroundImage: "url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMyIgaGVpZ2h0PSIzIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxyZWN0IHdpZHRoPSIzIiBoZWlnaHQ9IjMiIGZpbGw9IiNGQkZBRjAiIC8+PHJlY3Qgd2lkdGg9IjEiIGhlaWdodD0iMSIgZmlsbD0iI0FDQTg5OSIgLz48L3N2Zz4=')",
-            backgroundRepeat: 'repeat',
-            display: 'flex',
-            flexDirection: 'column'
-          }}>
-            {/* Desktop Horizontal View */}
-            <div className="timeline-desktop-layout">
-              <div style={{ display: 'flex', alignItems: 'flex-start', minWidth: 'max-content', padding: '4rem 2rem 2rem 2rem', gap: '8rem', position: 'relative' }}>
-                
-                {/* Background horizontal connection line */}
-                <div style={{
-                  position: 'absolute',
-                  left: '2rem',
-                  right: '2rem',
-                  top: 'calc(4rem + 30px)',
-                  height: '4px',
-                  backgroundColor: '#808080',
-                  borderTop: '2px solid #dfdfdf',
-                  borderBottom: '2px solid #dfdfdf',
-                  zIndex: 0
-                }} />
-
-                {timelineGroups.map((group, groupIndex) => (
-                  <div key={groupIndex} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', position: 'relative', zIndex: 1 }}>
-                    
-                    {/* Year Label */}
-                    <div style={{ position: 'absolute', top: '-3rem', fontWeight: 'bold', fontSize: '1.2rem', color: '#000', whiteSpace: 'nowrap' }}>
-                      {group.label}
-                    </div>
-                    
-                    {/* Branching vertical line for overlapping events */}
-                    {group.items.length > 1 && (
-                      <div style={{
-                        position: 'absolute',
-                        left: '50%',
-                        top: '30px',
-                        bottom: '30px',
-                        width: '4px',
-                        backgroundColor: '#808080',
-                        borderLeft: '2px solid #dfdfdf',
-                        borderRight: '2px solid #dfdfdf',
-                        transform: 'translateX(-50%)',
-                        zIndex: -1
-                      }} />
-                    )}
-                    
-                    {/* Group nodes */}
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '3rem', position: 'relative' }}>
-                      {group.items.map((item, itemIndex) => (
-                        <TimelineNode 
-                          key={itemIndex} 
-                          item={item} 
-                          onClick={() => openNode(item.index)} 
-                        />
-                      ))}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Mobile Vertical View (scrolls downwards) */}
-            <div className="timeline-mobile-layout">
-              <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', gap: '1.5rem', width: '100%' }}>
-                
-                {/* Continuous vertical connecting line */}
-                <div style={{
-                  position: 'absolute',
-                  left: '23px',
-                  top: '12px',
-                  bottom: '12px',
-                  width: '4px',
-                  backgroundColor: '#808080',
-                  borderLeft: '2px solid #dfdfdf',
-                  borderRight: '2px solid #dfdfdf',
-                  zIndex: 0
-                }} />
-
-                {mobileTimelineGroups.map((group, groupIndex) => (
-                  <div key={groupIndex} style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', position: 'relative', zIndex: 1 }}>
-                    
-                    {/* Year Header Badge */}
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                      <div className="convex" style={{
-                        backgroundColor: '#000080',
-                        color: '#fff',
-                        padding: '2px 8px',
-                        fontSize: '0.85rem',
-                        fontWeight: 'bold',
-                        letterSpacing: '0.5px',
-                        zIndex: 2,
-                        boxShadow: '1px 1px 0px rgba(0,0,0,0.5)',
-                        flexShrink: 0
-                      }}>
-                        {group.label}
-                      </div>
-                      <div style={{ height: '2px', flex: 1, backgroundColor: '#808080', borderBottom: '1px solid #fff' }} />
-                    </div>
-
-                    {/* Group Items */}
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-                      {group.items.map((item, itemIndex) => (
-                        <div 
-                          key={itemIndex}
-                          onClick={() => openNode(item.index)}
-                          className="convex timeline-mobile-card"
-                          style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '10px',
-                            padding: '6px 8px',
-                            backgroundColor: '#c0c0c0',
-                            cursor: 'pointer',
-                            position: 'relative',
-                            zIndex: 1,
-                            userSelect: 'none'
-                          }}
-                        >
-                          {/* Hexagon Node Icon */}
-                          <div style={{ flexShrink: 0, width: '46px', height: '46px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                            <div style={{
-                              width: '44px',
-                              height: '44px',
-                              clipPath: 'polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)',
-                              display: 'flex',
-                              justifyContent: 'center',
-                              alignItems: 'center',
-                              background: 'linear-gradient(135deg, #fff 0%, #c0c0c0 40%, #808080 100%)',
-                              boxShadow: 'inset 2px 2px 4px rgba(255,255,255,0.8)'
-                            }}>
-                              {getLogoContent(item.pos.company, 24)}
-                            </div>
-                          </div>
-
-                          {/* Node Information */}
-                          <div style={{ flex: 1, minWidth: 0 }}>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', flexWrap: 'wrap', gap: '2px' }}>
-                              <span style={{ fontWeight: 'bold', fontSize: '0.95rem', color: '#000' }}>
-                                {item.pos.company}
-                              </span>
-                              <span style={{ fontSize: '0.7rem', color: '#333', backgroundColor: '#e0e0e0', padding: '1px 4px', border: '1px solid #808080' }}>
-                                {item.pos.date}
-                              </span>
-                            </div>
-                            <div style={{ fontSize: '0.8rem', color: '#222', marginTop: '1px', fontWeight: '500' }}>
-                              {item.pos.title}
-                            </div>
-                            {item.pos.tags && (
-                              <div style={{ display: 'flex', gap: '3px', flexWrap: 'wrap', marginTop: '3px' }}>
-                                {item.pos.tags.slice(0, 3).map((t: any, ti: number) => (
-                                  <span key={ti} style={{ fontSize: '0.65rem', backgroundColor: t.starred ? '#ffffe1' : '#dfdfdf', border: '1px solid #808080', padding: '0px 3px', color: '#000' }}>
-                                    {t.name}
-                                  </span>
-                                ))}
-                                {item.pos.tags.length > 3 && (
-                                  <span style={{ fontSize: '0.65rem', color: '#555', alignSelf: 'center' }}>+{item.pos.tags.length - 3}</span>
-                                )}
-                              </div>
-                            )}
-                          </div>
-
-                          {/* Right Arrow indicator */}
-                          <div style={{ fontSize: '1.1rem', color: '#000080', fontWeight: 'bold', paddingRight: '2px', flexShrink: 0 }}>
-                            ›
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        ) : (
-          <div style={{ flex: 1, margin: '4px', overflowY: 'auto', display: 'flex', flexDirection: 'column', minHeight: 0 }}>
-            {/* Back button for easy mobile navigation */}
-            <div style={{ padding: '2px 4px 6px 4px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <button 
-                className="convex" 
-                onClick={() => setActiveTab('overview')}
-                style={{
-                  padding: '3px 8px',
-                  fontSize: '0.8rem',
-                  backgroundColor: '#c0c0c0',
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '4px',
-                  cursor: 'pointer',
-                  color: '#000',
-                  fontWeight: 'bold'
-                }}
-              >
-                ◀ Back to Timeline
-              </button>
-            </div>
-            <div style={{ flex: 1, minHeight: 0 }}>
-              <Position {...positions[parseInt(activeTab.split('-')[1])]} />
-            </div>
-          </div>
-        )}
-      </div>
-    </div>
-  );
-};
-
-export default TimelineWindow;
+}
