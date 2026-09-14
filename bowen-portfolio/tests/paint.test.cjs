@@ -31,6 +31,10 @@ test('API fails closed, gates moderation, bounds requests, and only queries appr
   assert.equal((await api.GET(new Request('https://example.com/api/drawings?review=1'))).status, 401);
   assert.equal((await api.PATCH(new Request('https://example.com/api/drawings', { method: 'PATCH', body: '{}' }))).status, 401);
   assert.equal(queries.length, 0);
+  const passwordApi = compile('app/api/drawings/route.ts', dependencies, { DATABASE_URL: 'test', PAINT_ADMIN_SECRET: 'a'.repeat(64), PAINT_REVIEW_PASSWORD: 'test review passphrase' });
+  assert.equal((await passwordApi.GET(new Request('https://example.com/api/drawings?review=1', { headers: { Authorization: 'Bearer ' + 'a'.repeat(64) } }))).status, 401);
+  assert.equal((await passwordApi.GET(new Request('https://example.com/api/drawings?review=1', { headers: { Authorization: 'Bearer test review passphrase' } }))).status, 200);
+  queries.length = 0;
   await api.GET(new Request('https://example.com/api/drawings'));
   assert.equal(queries[0][0], 'approved');
   const submit = (body, origin = 'https://example.com') => api.POST(new Request('https://example.com/api/drawings', { method: 'POST', headers: { origin, 'Content-Type': 'application/json' }, body }));

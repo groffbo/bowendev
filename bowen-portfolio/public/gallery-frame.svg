@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48" shape-rendering="crispEdges">
+  <defs>
+    <g id="corner">
+      <path d="M2 2H12V4H4V12H2Z" fill="#b47a45"/>
+      <path d="M4 4H10V6H6V10H4Z" fill="#442713"/>
+      <path d="M6 6H10V10H6Z" fill="#a86a35"/>
+      <path d="M10 6H12V12H6V10H10Z" fill="#603619"/>
+    </g>
+  </defs>
+  <path d="M2 0H46V2H48V46H46V48H2V46H0V2H2Z M12 12V36H36V12Z" fill="#352214" fill-rule="evenodd"/>
+  <path d="M2 2H46V46H2Z M12 12V36H36V12Z" fill="#875027" fill-rule="evenodd"/>
+  <path d="M2 2H46V4H4V46H2Z" fill="#b47a45"/>
+  <path d="M44 4H46V46H4V44H44Z" fill="#603619"/>
+  <path d="M12 6H36V8H12Z M6 12H8V36H6Z" fill="#a86a35"/>
+  <path d="M12 40H36V42H12Z M40 12H42V36H40Z" fill="#603619"/>
+  <path d="M10 10H38V12H12V38H10Z" fill="#442713"/>
+  <path d="M36 12H38V38H12V36H36Z" fill="#b47a45"/>
+  <use href="#corner"/>
+  <use href="#corner" transform="translate(48 0) scale(-1 1)"/>
+  <use href="#corner" transform="translate(0 48) scale(1 -1)"/>
+  <use href="#corner" transform="translate(48 48) scale(-1 -1)"/>
+</svg>

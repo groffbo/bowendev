@@ -7,7 +7,7 @@ export const dynamic = 'force-dynamic';
 const reply = (data: unknown, status = 200) => Response.json(data, { status, headers: { 'Cache-Control': 'no-store' } });
 const configured = () => Boolean(process.env.DATABASE_URL && process.env.PAINT_ADMIN_SECRET?.length && process.env.PAINT_ADMIN_SECRET.length >= 32);
 function isAdmin(request: Request) {
-  const expected = process.env.PAINT_ADMIN_SECRET;
+  const expected = process.env.PAINT_REVIEW_PASSWORD || process.env.PAINT_ADMIN_SECRET;
   const supplied = request.headers.get('authorization')?.replace(/^Bearer /, '');
   return Boolean(expected && supplied && Buffer.byteLength(expected) === Buffer.byteLength(supplied) && timingSafeEqual(Buffer.from(expected), Buffer.from(supplied)));
 }

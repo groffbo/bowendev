@@ -10,9 +10,13 @@ The Paint icon opens an anonymous drawing guestbook. The drawing tools and PNG d
 4. Generate a random review secret, for example with `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"`. Save it privately and add it to Vercel as `PAINT_ADMIN_SECRET`. At least 32 characters are required. Never prefix either variable with `NEXT_PUBLIC_`, commit values, or paste them into a chat.
 5. Redeploy the Vercel project so the environment variables take effect. For local development, add the same variable names to an ignored `.env.local` file.
 
+## Review password
+
+Set server-only `PAINT_REVIEW_PASSWORD` in `.env.local` and in Vercel Production, then redeploy. The review page uses this password when set; otherwise it falls back to `PAINT_ADMIN_SECRET`. Keep `PAINT_ADMIN_SECRET` configured for submission rate-limit hashing.
+
 ## Review drawings
 
-Open `/paint/review` and enter `PAINT_ADMIN_SECRET`. The key stays in memory in the open page and is sent as a bearer credential over HTTPS; closing the page clears it. Approve publishes a drawing; Delete removes it. Public API requests only return approved drawings. Nothing publishes automatically.
+Open `/paint/review` and enter `PAINT_REVIEW_PASSWORD` (or `PAINT_ADMIN_SECRET` if no separate password is set). The key stays in memory in the open page and is sent as a bearer credential over HTTPS; closing the page clears it. Approve publishes a drawing; Delete removes it. Public API requests only return approved drawings. Nothing publishes automatically.
 
 To remove an already-approved drawing, use Neon's table editor to delete its `paint_drawings` row. This also removes its stored brush strokes; there are no orphan image files.
 

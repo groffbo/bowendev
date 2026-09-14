@@ -6,7 +6,7 @@ import { COLORS, Drawing, HEIGHT, renderDrawing, Stroke, validStrokes, WIDTH } f
 function DrawingPreview({ drawing }: { drawing: Drawing }) {
   const canvas = useRef<HTMLCanvasElement>(null);
   useEffect(() => { if (canvas.current) renderDrawing(canvas.current, drawing.strokes); }, [drawing]);
-  return <canvas ref={canvas} width={WIDTH} height={HEIGHT} role="img" aria-label={`Anonymous drawing from ${new Date(drawing.created_at).toLocaleDateString()}`} style={{ width: '100%', display: 'block', background: '#fff', border: '2px inset #eee' }} />;
+  return <div style={{ border: '12px solid transparent', borderImage: 'url("/gallery-frame.svg") 12 stretch', imageRendering: 'pixelated', filter: 'drop-shadow(2px 2px 0 #352214)' }}><canvas ref={canvas} width={WIDTH} height={HEIGHT} role="img" aria-label={`Anonymous drawing from ${new Date(drawing.created_at).toLocaleDateString()}`} style={{ width: '100%', height: 'auto', display: 'block', background: '#fff' }} /></div>;
 }
 
 export function DrawingGallery({ review = false }: { review?: boolean }) {
@@ -15,22 +15,36 @@ export function DrawingGallery({ review = false }: { review?: boolean }) {
   const [message, setMessage] = useState('');
   const [busy, setBusy] = useState(false);
   const [more, setMore] = useState(false);
+  const sentinel = useRef<HTMLDivElement>(null);
+  const inFlight = useRef(false);
+  const nextCursor = useRef<string | null>(null);
   async function load(older = false) {
+    if (inFlight.current) return;
+    inFlight.current = true;
     setBusy(true); setMessage('');
     try {
       const params = new URLSearchParams();
       if (review) params.set('review', '1');
-      if (older && drawings.length) params.set('before', drawings[drawings.length - 1].created_at);
+      if (older && nextCursor.current) params.set('before', nextCursor.current);
       const response = await fetch(`/api/drawings?${params}`, { headers: review ? { Authorization: `Bearer ${key}` } : {} });
       const data = await response.json();
       if (!response.ok) throw new Error(data.error);
       setDrawings(previous => older ? [...previous, ...data.drawings] : data.drawings);
       setMore(data.drawings.length === 12);
+      nextCursor.current = data.drawings.at(-1)?.created_at ?? null;
       if (!data.drawings.length && !older) setMessage(review ? 'No drawings waiting for review.' : 'No drawings yet. Leave the first one!');
     } catch (error) { setMessage(error instanceof Error ? error.message : 'Could not load drawings. Please retry.'); }
-    finally { setBusy(false); }
+    finally { inFlight.current = false; setBusy(false); }
   }
   useEffect(() => { if (!review) void load(); }, [review]); // Review waits for the owner to enter a key.
+  useEffect(() => {
+    if (!more || busy || message || !sentinel.current) return;
+    const observer = new IntersectionObserver(entries => {
+      if (entries.some(entry => entry.isIntersecting)) void load(true);
+    }, { rootMargin: '160px' });
+    observer.observe(sentinel.current);
+    return () => observer.disconnect();
+  }, [more, busy, message, drawings]);
   async function moderate(id: string, action: 'approve' | 'delete') {
     setBusy(true); setMessage('');
     try {
@@ -42,7 +56,7 @@ export function DrawingGallery({ review = false }: { review?: boolean }) {
     finally { setBusy(false); }
   }
   return <section style={{ padding: '10px' }} aria-label={review ? 'Review drawings' : 'Anonymous drawing gallery'}>
-    {review && <label>Review key <input type="password" value={key} autoComplete="off" onChange={event => setKey(event.target.value)} style={{ color: '#000', background: '#fff' }} /></label>}
+    {review && <label>Review password <input type="password" value={key} autoComplete="off" onChange={event => setKey(event.target.value)} style={{ color: '#000', background: '#fff' }} /></label>}
     <button className="convex" disabled={busy} onClick={() => load()} style={{ padding: '5px 10px', marginBottom: '10px' }}>{busy ? 'Loading…' : review ? 'Load pending drawings' : 'Refresh gallery'}</button>
     <p role="status">{message}</p>
     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '12px' }}>
@@ -52,7 +66,7 @@ export function DrawingGallery({ review = false }: { review?: boolean }) {
         {review && <div style={{ display: 'flex', gap: '8px' }}><button className="convex" disabled={busy} onClick={() => moderate(drawing.id, 'approve')}>Approve</button><button className="convex" disabled={busy} onClick={() => moderate(drawing.id, 'delete')}>Delete</button></div>}
       </article>)}
     </div>
-    {more && <button className="convex" disabled={busy} onClick={() => load(true)} style={{ marginTop: '12px' }}>Older drawings</button>}
+    <div ref={sentinel} aria-live="polite" style={{ minHeight: '32px', paddingTop: '12px', fontSize: '0.875rem' }}>{busy ? 'Loading drawings…' : more && !message ? 'Scroll for more drawings' : ''}</div>
   </section>;
 }
 
@@ -170,7 +184,7 @@ export default function PaintWindow() {
       .paint-confirm header { display:flex; align-items:center; justify-content:space-between; background:#000080; color:#fff; padding:3px 5px; }
       .paint-confirm header button { min-height:22px; padding:0 5px; }
     `}</style>
-    <nav className="paint-tools" aria-label="Paint tabs"><button className="convex" aria-pressed={tab === 'paint'} onClick={() => setTab('paint')}>Paint</button><button className="convex" aria-pressed={tab === 'gallery'} onClick={() => setTab('gallery')}>Guest gallery</button></nav>
+    <nav className="paint-tools" aria-label="Paint tabs"><button className="convex" aria-pressed={tab === 'paint'} onClick={() => setTab('paint')}>Paint</button><button className="convex" aria-pressed={tab === 'gallery'} style={{ background: tab === 'gallery' ? '#000080' : '#174ca6', color: '#fff', fontWeight: 'bold' }} onClick={() => setTab('gallery')}>Gallery</button></nav>
     <div className="paint-editor" hidden={tab !== 'paint'}>
       <div className="paint-tools">
         <button className="convex" disabled={busy} aria-pressed={!eraser} onClick={() => setEraser(false)}>✎ Pencil</button>

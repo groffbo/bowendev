@@ -131,10 +131,10 @@ function Page() {
             <Image src={recycleIcon} alt="Recycle Bin Icon"></Image>
             Recycle Bin
           </button>
-          <button className="icon" onClick={() => window.open('/bowen-groff-resume.pdf', '_blank')}>
+          <a className="icon" href="/bowen-groff-resume.pdf" target={isMobile ? "_self" : "_blank"} rel="noopener noreferrer">
             <Image src={textFileIcon} alt="Text file icon"></Image>
             Resume.txt
-          </button>
+          </a>
           <button
             className="icon"
             onClick={() => window.open("https://github.com/groffbo", "_blank")}
@@ -142,15 +142,10 @@ function Page() {
             <Image src={github} alt="Puzzle pieces icon"></Image>
             GitHub
           </button>
-          <button
-            className="icon"
-            onClick={() =>
-              window.open("https://www.linkedin.com/in/bowengroff/", "_blank")
-            }
-          >
+          <a className="icon" href="https://www.linkedin.com/in/bowengroff/" target={isMobile ? "_self" : "_blank"} rel="noopener noreferrer">
             <Image src={linkedin} alt="3 connected computers icon"></Image>
             Linkedin
-          </button>
+          </a>
 
           <button
             className="icon"
