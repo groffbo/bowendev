@@ -34,20 +34,26 @@ export default function Window({
   const windowRef = useRef<HTMLDivElement>(null);
   const [pos, setPos] = useState({ x: startX, y: startY });
   const [dragging, setDrag] = useState(false);
+  const [hasMoved, setHasMoved] = useState(false);
   const [offset, setOffset] = useState({ x: 0, y: 0 });
 
   const startDrag = (e: React.MouseEvent) => {
-    if (center) return;
+    if (e.button !== 0 || (e.target as HTMLElement).closest("button")) return;
+    const bounds = windowRef.current?.getBoundingClientRect();
+    if (!bounds) return;
+    e.preventDefault();
+    setPos({ x: bounds.left, y: bounds.top });
+    setHasMoved(true);
     setDrag(true);
     setOffset({
-      x: e.clientX - pos.x,
-      y: e.clientY - pos.y,
+      x: e.clientX - bounds.left,
+      y: e.clientY - bounds.top,
     });
   };
 
   useEffect(() => {
     const duringDrag = (e: MouseEvent) => {
-      if (!dragging || center) return;
+      if (!dragging) return;
       setPos({
         x: e.clientX - offset.x,
         y: e.clientY - offset.y,
@@ -65,7 +71,7 @@ export default function Window({
       document.removeEventListener("mousemove", duringDrag);
       document.removeEventListener("mouseup", stopDrag);
     };
-  }, [dragging, offset, center]);
+  }, [dragging, offset]);
 
   const style: React.CSSProperties = {
     position: "absolute",
@@ -77,7 +83,7 @@ export default function Window({
     flexDirection: "column",
   };
 
-  if (center) {
+  if (center && !hasMoved) {
     style.left = "50%";
     style.top = "50%";
     style.transform = "translate(-50%, -50%)";
