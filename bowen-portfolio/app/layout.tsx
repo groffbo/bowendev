@@ -11,9 +11,8 @@ const windows95 = localFont({
 
 export const metadata: Metadata = {
   title: "Bowen's Desktop",
-  description: "Bowen Groff's personal portfolio",
-};
-
+  description: "Hello World! I'm Bowen, current AMD Undergrad Research Fellow, previous intern at AMD and L3Harris, Knight Hacks Director, and Computer Engineer at UCF. Interested in GPU programming and HPC"
+}
 export default function RootLayout({
   children,
 }: Readonly<{
